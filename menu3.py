@@ -42,6 +42,8 @@ def awsattachinstances():
     key=input("Enter the key name: ")
     sg=input("Enter the security group id: ")
     os.system("aws ec2 run-instances  --image-id {} --instance-type {}  --count {} --subnet-id {} --key-name {} --security-group-ids {} ".format(amid,insttype,cnt,subid,key,sg))
+def AWSconfigure():
+    os.system('aws configure')
 os.system("tput setaf 1")
 print('\t\tWelcome to my TUI to make your life easy\t\t')
 os.system("tput setaf 7")
@@ -75,8 +77,11 @@ Press 11: Start Hadoop Cluster
 Press 12: Increase the size of Hadoop Node
 Press 13: Create LVM Storage
 Press 14: Launcing AWS instances
-Press 15: Access CCTV live feed
-Press 16: Exit
+Press 15: Configure AWS CLI
+Press 16: Create EBS Volume
+Press 17: Attach EBS Volume to EC2 Instance
+Press 18: Access Camera live feed
+Press 19: Exit
 """)
 repeat=input("To continoue press Y/N = ")
 repeat1=repeat.lower()
@@ -162,6 +167,18 @@ while repeat1=='y' :
         elif int(ch)==14:
             awsattachinstances()
         elif int(ch)==15:
+            AWSconfigure()
+        elif int(ch)==16:
+            voltype=input("Enter the Volume type(example: gp2): ")
+            size=input("Enter the Volume Size: ")
+            zone=input("Enter the Availability Zone(example: us-west-1c): ")
+            os.system("aws ec2 create-volume --volume-type {} --size {} --availability-zone {}".format(voltype,size,zone))
+        elif int(ch)==17:
+            volid=input("Enter the Volume ID: ")
+            instid=input("Enter the Instance ID: ")
+            dev=input("Enter the device name(example: /dev/sdf): ")
+            os.system("aws ec2 attach-volume --volume-id {} --instance-id {} --device {}".format(volid,instid,dev))
+        elif int(ch)==18:
             cap = cv2.VideoCapture('http://192.168.1.5:8080/video')
             while True:
                 status, photo = cap.read()
@@ -170,7 +187,7 @@ while repeat1=='y' :
                     break
             cv2.destroyAllWindows()
             cap.release()
-        elif int(ch)==16:
+        elif int(ch)==19:
             print("Exiting the TUI!!!!")
             exit()
         else :
