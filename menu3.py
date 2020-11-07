@@ -44,6 +44,48 @@ def awsattachinstances():
     os.system("aws ec2 run-instances  --image-id {} --instance-type {}  --count {} --subnet-id {} --key-name {} --security-group-ids {} ".format(amid,insttype,cnt,subid,key,sg))
 def AWSconfigure():
     os.system('aws configure')
+def configureHadoop():
+    choice=input("Configure system as (DataNode/NameNode) = ")
+    choice1=choice.lower()
+    if choince1=='namenode':
+        print("Updating hdfs-site.xml......")
+        filename="/etc/hadoop/hdfs-site.xml"
+        f = open(filename,'r')
+        file_lines=list(f.readlines())
+        offset = len(file_lines) - 1
+        if file_lines[offset-1] == "</property>\n":
+            print("hdfs-site is already configured.........\n")
+            print("checking core-site.xml.........")
+            return
+        folder = input("Create folder for datanode(enter path): ")
+        string = "<property>\n<name>dfs.data.dir</name>\n<value>{}</value>\n</property>\n".format(folder)
+        file_lines.insert(offset, string)
+        print(file_lines)
+        f.close()
+
+        f = open(filename,'w+')
+        for i in range(len(file_lines)):
+            f.write(file_lines[i])
+        f.close()
+        print("hdfs-site.xml file successfully Updated...")
+        print("Updating and Setting up Core-site.xml file...... ")
+        filename="/etc/hadoop/core-site.xml"
+        f = open(filename,'r')
+        file_lines=list(f.readlines())
+        offset = len(file_lines) - 1
+        if file_lines[offset-1] == "</property>\n":
+            print("core-site.xml is already configured.........")
+            return
+        ip = input("Enter ip of namenode: ")
+        string = "<property>\n<name>fs.default.name</name>\n<value>hdfs://{}:9001</value>\n</property>\n".format(ip)
+        file_lines.insert(offset, string)
+        print(file_lines)
+        f.close()
+        f = open(filename,'w+')
+        for i in range(len(file_lines)):
+            f.write(file_lines[i])
+        f.close()
+        print("core-site.xml file successfuly configured....")
 os.system("tput setaf 1")
 print('\t\tWelcome to my TUI to make your life easy\t\t')
 os.system("tput setaf 7")
@@ -80,8 +122,9 @@ Press 14: Launcing AWS instances
 Press 15: Configure AWS CLI
 Press 16: Create EBS Volume
 Press 17: Attach EBS Volume to EC2 Instance
-Press 18: Access Camera live feed
-Press 19: Exit
+Press 18: Configure Hadoop 
+Press 19: Access Camera live feed
+Press 20: Exit
 """)
 repeat=input("To continoue press Y/N = ")
 repeat1=repeat.lower()
