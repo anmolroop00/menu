@@ -34,6 +34,14 @@ def remoteCreateLVM():
     rdrive=input("Which Drive you want to mount(Enter Drive name) = ")
     os.system("ssh {0} mount /dev/{1}/{2} /{3}".format(IP,rvgname,rlvname,rdrive))
     print("Drive Mounted Successfully....")
+def awsattachinstances():
+    amid=input("Enter the AMI ID: ")
+    insttype=input("Enter th Instance type: ")
+    cnt=input("Enter the number of the instance you want to launch: ")
+    subid=input("Enter the Subnet ID: ")
+    key=input("Enter the key name: ")
+    sg=input("Enter the security group id: ")
+    os.system("aws ec2 run-instances  --image-id {} --instance-type {}  --count {} --subnet-id {} --key-name {} --security-group-ids {} ".format(amid,insttype,cnt,subid,key,sg))
 os.system("tput setaf 1")
 print('\t\tWelcome to my TUI to make your life easy\t\t')
 os.system("tput setaf 7")
@@ -66,8 +74,9 @@ Press 10: Start docker services
 Press 11: Start Hadoop Cluster
 Press 12: Increase the size of Hadoop Node
 Press 13: Create LVM Storage
-Press 14: Access CCTV live feed
-Press 15: Exit
+Press 14: Launcing AWS instances
+Press 15: Access CCTV live feed
+Press 16: Exit
 """)
 repeat=input("To continoue press Y/N = ")
 repeat1=repeat.lower()
@@ -151,6 +160,8 @@ while repeat1=='y' :
         elif int(ch)==13:
             createLVM()
         elif int(ch)==14:
+            awsattachinstances()
+        elif int(ch)==15:
             cap = cv2.VideoCapture('http://192.168.1.5:8080/video')
             while True:
                 status, photo = cap.read()
@@ -159,7 +170,7 @@ while repeat1=='y' :
                     break
             cv2.destroyAllWindows()
             cap.release()
-        elif int(ch)==15:
+        elif int(ch)==16:
             print("Exiting the TUI!!!!")
             exit()
         else :
