@@ -2,6 +2,38 @@ import os
 import cv2
 import getpass
 import subprocess as sp
+def createLVM():
+    os.system('fdisk -l')
+    diskname=input("Enter Disk name=")
+    os.system('pvcreate {}'.format(diskname))
+    vgname=input('Enter Virtual Group Name')
+    os.system('vgcreate {0} {1}'.format(vgname,diskname))
+    print('Creating Partition...')
+    sizel=input('Specify size in(G,M)=')
+    lvname=input('LVM Name=')
+    os.system('lvcreate --size {} --name {} {}'.format(sizel,lvname,vgname))
+    print('Formating LVM...')
+    os.system('mkfs.ext4 /dev/{}/{}'.format(vgname,lvname))
+    print('LVM Partition Created and Formated Successfully..')
+    drive=input("Which Drive you want to mount(Enter Drive name) = ")
+    os.system("mount /dev/{}/{} /{}".format(vgname,lvname,drive))
+    print("Drive Mounted Successfully....")
+def remoteCreateLVM():
+    os.system('ssh {0} fdisk -l'.format(IP))
+    remotediskName=input("Enter disk name=")
+    os.system('ssh {0} pvcreate {1}'.format(IP,remotediskName))
+    rvgname=input('Enter Virtual Group Name = ')
+    os.system('ssh {0} vgcreate {1} {2}'.format(IP,rvgname,remotediskName))
+    print('Creating Partition...')
+    rsizel=input('Specify size in(G,M)=')
+    rlvname=input('LVM Name=')
+    os.system('ssh {0} lvcreate --size {1} --name {2} {3}'.format(IP,rsizel,rlvname,rvgname))
+    print('Formating LVM...')
+    os.system('ssh {0} mkfs.ext4 /dev/{1}/{2}'.format(IP,rvgname,rlvname))
+    print('LVM Partition Created and Formated Successfully..')
+    rdrive=input("Which Drive you want to mount(Enter Drive name) = ")
+    os.system("ssh {0} mount /dev/{1}/{2} /{3}".format(IP,rvgname,rlvname,rdrive))
+    print("Drive Mounted Successfully....")
 os.system("tput setaf 1")
 print('\t\tWelcome to my TUI to make your life easy\t\t')
 os.system("tput setaf 7")
@@ -31,8 +63,11 @@ Press 7: Delete Directory
 Press 8: Switch Host
 Press 9: Stop the APACHE Web Server
 Press 10: Start docker services
-Press 11: Access CCTV live feed
-Press 12: Exit
+Press 11: Start Hadoop Cluster
+Press 12: Increase the size of Hadoop Node
+Press 13: Create LVM Storage
+Press 14: Access CCTV live feed
+Press 15: Exit
 """)
 repeat=input("To continoue press Y/N = ")
 repeat1=repeat.lower()
@@ -108,6 +143,14 @@ while repeat1=='y' :
                 print("Stoping Docker")
                 os.system('systemctl stop docker')
         elif int(ch)==11:
+            print("Checking the Hadoop")
+            os.system('hadoop-daemon.sh start datanode')
+        elif int(ch)==12:
+            size=input("Enter the Size with (G,M)=")
+            os.system('lvextend --size +{} /dev/hadooplvm/hadoopdata'.format(size))
+        elif int(ch)==13:
+            createLVM()
+        elif int(ch)==14:
             cap = cv2.VideoCapture('http://192.168.1.5:8080/video')
             while True:
                 status, photo = cap.read()
@@ -116,7 +159,7 @@ while repeat1=='y' :
                     break
             cv2.destroyAllWindows()
             cap.release()
-        elif int(ch)==12:
+        elif int(ch)==15:
             print("Exiting the TUI!!!!")
             exit()
         else :
@@ -176,6 +219,11 @@ while repeat1=='y' :
             imageSel=input("Enter the Image do you want to run = ")
             os.system('ssh {} docker run  -i {}'.format(IP, imageSel))
         elif int(ch)==12:
+            size=input("Enter the Size with (G,M)=")
+            os.system('ssh {0} lvextend --size +{1} /dev/hadooplvm/hadoopdata'.format(IP,size))
+        elif int(ch)==13:
+            remoteCreateLVM()
+        elif int(ch)==15:
             print("Exiting the TUI !!!!!")
             exit()
         else :
