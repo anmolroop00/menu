@@ -36,12 +36,12 @@ def remoteCreateLVM():
     print("Drive Mounted Successfully....")
 def awsattachinstances():
     amid=input("Enter the AMI ID: ")
-    insttype=input("Enter th Instance type: ")
-    cnt=input("Enter the number of the instance you want to launch: ")
-    subid=input("Enter the Subnet ID: ")
+    instancetype=input("Enter th Instance type: ")
+    count=input("Enter the number of the instance you want to launch: ")
+    subnetid=input("Enter the Subnet ID: ")
     key=input("Enter the key name: ")
-    sg=input("Enter the security group id: ")
-    os.system("aws ec2 run-instances  --image-id {} --instance-type {}  --count {} --subnet-id {} --key-name {} --security-group-ids {} ".format(amid,insttype,cnt,subid,key,sg))
+    securitygroup=input("Enter the security group id: ")
+    os.system("aws ec2 run-instances  --image-id {} --instance-type {}  --count {} --subnet-id {} --key-name {} --security-group-ids {} ".format(amid,instancetype,count,subnetid,key,securitygroup))
 def AWSconfigure():
     os.system('aws configure')
 def configureHadoophdfs():
@@ -130,9 +130,7 @@ while repeat1=='y' :
     print("Enter yor choice = ",end="")
     ch=input()
 
-    if location1=='local':
-
-    
+    if location1=='local':    
         if int(ch)==1 :
             os.system("date")
         elif int(ch)==2 :
@@ -294,7 +292,7 @@ while repeat1=='y' :
             os.system('ssh {0} lvextend --size +{1} /dev/hadooplvm/hadoopdata'.format(IP,size))
         elif int(ch)==13:
             remoteCreateLVM()
-        elif int(ch)==15:
+        elif int(ch)==20:
             print("Exiting the TUI !!!!!")
             exit()
         else :
